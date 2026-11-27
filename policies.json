@@ -1,36 +1,24 @@
-
 [
-  {
-    "id": "POL-001",
-    "owner": "MIXI",
-    "name": "ประกันสุขภาพเหมาจ่าย (AIA)",
-    "policy_no": "1234567890",
-    "amount": 32500.00,
-    "due_date": "2026-12-15",
-    "frequency": "รายปี",
-    "status": "pending",
-    "note": "หักผ่านบัตรเครดิต กรุงศรี JCB"
-  },
-  {
-    "id": "POL-002",
-    "owner": "คุณโมค่า",
-    "name": "ประกันสะสมทรัพย์ 15/25",
-    "policy_no": "0987654321",
-    "amount": 50000.00,
-    "due_date": "2027-01-20",
-    "frequency": "รายปี",
-    "status": "pending",
-    "note": "ลดหย่อนภาษี"
-  },
-  {
-    "id": "POL-003",
-    "owner": "คนที่ 2 (แฟน/ครอบครัว)",
-    "name": "ประกันชีวิตตลอดชีพ",
-    "policy_no": "5566778899",
-    "amount": 24000.00,
-    "due_date": "2026-12-15",
-    "frequency": "รายปี",
-    "status": "pending",
-    "note": "โอนจ่ายผ่านแอปธนาคาร"
-  }
+  { "id": "MIXI-01", "owner": "MIXI", "company": "FWD", "amount": 17800.00, "due_mm_dd": "12-14", "status": "pending", "note": "รอบเดือน 1" },
+  { "id": "MIXI-02", "owner": "MIXI", "company": "TIP", "amount": 4977.11, "due_mm_dd": "01-15", "status": "pending", "note": "รอบเดือน 1" },
+  { "id": "MIXI-03", "owner": "MIXI", "company": "FWD", "amount": 3385.00, "due_mm_dd": "03-21", "status": "pending", "note": "รอบเดือน 3" },
+  { "id": "MIXI-04", "owner": "MIXI", "company": "FWD", "amount": 3500.00, "due_mm_dd": "03-25", "status": "pending", "note": "รอบเดือน 3" },
+  { "id": "MIXI-05", "owner": "MIXI", "company": "Rabbit", "amount": 101342.00, "due_mm_dd": "03-29", "status": "pending", "note": "รอบเดือน 3" },
+  { "id": "MIXI-06", "owner": "MIXI", "company": "AXA", "amount": 4784.00, "due_mm_dd": "04-07", "status": "pending", "note": "รอบเดือน 4" },
+  { "id": "MIXI-07", "owner": "MIXI", "company": "FWD", "amount": 6878.00, "due_mm_dd": "07-14", "status": "pending", "note": "รอบเดือน 7" },
+  { "id": "MIXI-08", "owner": "MIXI", "company": "AIA", "amount": 23197.00, "due_mm_dd": "08-04", "status": "pending", "note": "รอบเดือน 8" },
+  { "id": "MIXI-09", "owner": "MIXI", "company": "MTL", "amount": 4186.00, "due_mm_dd": "11-29", "status": "pending", "note": "รอบเดือน 11" },
+  { "id": "MIXI-10", "owner": "MIXI", "company": "MTL", "amount": 16308.00, "due_mm_dd": "11-29", "status": "pending", "note": "รอบเดือน 11" },
+  { "id": "MIXI-11", "owner": "MIXI", "company": "MTL", "amount": 52500.00, "due_mm_dd": "12-20", "status": "pending", "note": "รอบเดือน 12" },
+  { "id": "MIXI-12", "owner": "MIXI", "company": "AIA", "amount": 34500.00, "due_mm_dd": "12-21", "status": "pending", "note": "รอบเดือน 12" },
+  { "id": "MIXI-13", "owner": "MIXI", "company": "FWD", "amount": 3625.00, "due_mm_dd": "12-23", "status": "pending", "note": "รอบเดือน 12" },
+  { "id": "MIXI-14", "owner": "MIXI", "company": "FWD", "amount": 3500.00, "due_mm_dd": "12-24", "status": "pending", "note": "รอบเดือน 12" },
+  { "id": "MIXI-15", "owner": "MIXI", "company": "FWD", "amount": 3375.00, "due_mm_dd": "12-25", "status": "pending", "note": "รอบเดือน 12" },
+
+  { "id": "PAI-01", "owner": "PAI", "company": "FWD", "amount": 8494.00, "due_mm_dd": "07-14", "status": "pending", "note": "รอบเดือน 7" },
+  { "id": "PAI-02", "owner": "PAI", "company": "มอคค่า", "amount": 2500.00, "due_mm_dd": "11-16", "status": "pending", "note": "รอบเดือน 11" },
+  { "id": "PAI-03", "owner": "PAI", "company": "วิริยะ", "amount": 18827.99, "due_mm_dd": "11-17", "status": "pending", "note": "รอบเดือน 11" },
+  { "id": "PAI-04", "owner": "PAI", "company": "MTL", "amount": 50900.00, "due_mm_dd": "12-20", "status": "pending", "note": "รอบเดือน 12" },
+  { "id": "PAI-05", "owner": "PAI", "company": "AIA", "amount": 32000.00, "due_mm_dd": "12-21", "status": "pending", "note": "รอบเดือน 12" },
+  { "id": "PAI-06", "owner": "PAI", "company": "ไทยประกัน", "amount": 18000.00, "due_mm_dd": "12-31", "status": "pending", "note": "รอบเดือน 12" }
 ]
