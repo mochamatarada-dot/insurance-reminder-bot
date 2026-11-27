@@ -3,7 +3,7 @@
     "id": "MIXI-01",
     "owner": "MIXI",
     "company": "FWD",
-    "amount": 17800.0,
+    "amount": 17800,
     "due_mm_dd": "12-14",
     "status": "pending",
     "note": "รอบเดือน 1"
@@ -21,7 +21,7 @@
     "id": "MIXI-03",
     "owner": "MIXI",
     "company": "FWD",
-    "amount": 3385.0,
+    "amount": 3385,
     "due_mm_dd": "03-21",
     "status": "pending",
     "note": "รอบเดือน 3"
@@ -30,7 +30,7 @@
     "id": "MIXI-04",
     "owner": "MIXI",
     "company": "FWD",
-    "amount": 3500.0,
+    "amount": 3500,
     "due_mm_dd": "03-25",
     "status": "pending",
     "note": "รอบเดือน 3"
@@ -39,7 +39,7 @@
     "id": "MIXI-05",
     "owner": "MIXI",
     "company": "Rabbit",
-    "amount": 101342.0,
+    "amount": 101342,
     "due_mm_dd": "03-29",
     "status": "pending",
     "note": "รอบเดือน 3"
@@ -48,7 +48,7 @@
     "id": "MIXI-06",
     "owner": "MIXI",
     "company": "AXA",
-    "amount": 4784.0,
+    "amount": 4784,
     "due_mm_dd": "04-07",
     "status": "pending",
     "note": "รอบเดือน 4"
@@ -57,7 +57,7 @@
     "id": "MIXI-07",
     "owner": "MIXI",
     "company": "FWD",
-    "amount": 6878.0,
+    "amount": 6878,
     "due_mm_dd": "07-14",
     "status": "pending",
     "note": "รอบเดือน 7"
@@ -66,7 +66,7 @@
     "id": "MIXI-08",
     "owner": "MIXI",
     "company": "AIA",
-    "amount": 23197.0,
+    "amount": 23197,
     "due_mm_dd": "08-04",
     "status": "pending",
     "note": "รอบเดือน 8"
@@ -75,7 +75,7 @@
     "id": "MIXI-09",
     "owner": "MIXI",
     "company": "MTL",
-    "amount": 4186.0,
+    "amount": 4186,
     "due_mm_dd": "11-29",
     "status": "pending",
     "note": "รอบเดือน 11"
@@ -84,7 +84,7 @@
     "id": "MIXI-10",
     "owner": "MIXI",
     "company": "MTL",
-    "amount": 16308.0,
+    "amount": 16308,
     "due_mm_dd": "11-29",
     "status": "pending",
     "note": "รอบเดือน 11"
@@ -93,7 +93,7 @@
     "id": "MIXI-11",
     "owner": "MIXI",
     "company": "MTL",
-    "amount": 52500.0,
+    "amount": 52500,
     "due_mm_dd": "12-20",
     "status": "pending",
     "note": "รอบเดือน 12"
@@ -102,7 +102,7 @@
     "id": "MIXI-12",
     "owner": "MIXI",
     "company": "AIA",
-    "amount": 34500.0,
+    "amount": 34500,
     "due_mm_dd": "12-21",
     "status": "pending",
     "note": "รอบเดือน 12"
@@ -111,7 +111,7 @@
     "id": "MIXI-13",
     "owner": "MIXI",
     "company": "FWD",
-    "amount": 3625.0,
+    "amount": 3625,
     "due_mm_dd": "12-23",
     "status": "pending",
     "note": "รอบเดือน 12"
@@ -120,7 +120,7 @@
     "id": "MIXI-14",
     "owner": "MIXI",
     "company": "FWD",
-    "amount": 3500.0,
+    "amount": 3500,
     "due_mm_dd": "12-24",
     "status": "pending",
     "note": "รอบเดือน 12"
@@ -129,7 +129,7 @@
     "id": "MIXI-15",
     "owner": "MIXI",
     "company": "FWD",
-    "amount": 3375.0,
+    "amount": 3375,
     "due_mm_dd": "12-25",
     "status": "pending",
     "note": "รอบเดือน 12"
@@ -138,7 +138,7 @@
     "id": "PAI-01",
     "owner": "PAI",
     "company": "FWD",
-    "amount": 8494.0,
+    "amount": 8494,
     "due_mm_dd": "07-14",
     "status": "pending",
     "note": "รอบเดือน 7"
@@ -147,10 +147,11 @@
     "id": "PAI-02",
     "owner": "PAI",
     "company": "มอคค่า",
-    "amount": 2500.0,
+    "amount": 2500,
     "due_mm_dd": "11-16",
-    "status": "pending",
-    "note": "รอบเดือน 11"
+    "status": "paid",
+    "note": "รอบเดือน 11",
+    "paid_date": "2026-11-27"
   },
   {
     "id": "PAI-03",
@@ -166,7 +167,7 @@
     "id": "PAI-04",
     "owner": "PAI",
     "company": "MTL",
-    "amount": 50900.0,
+    "amount": 50900,
     "due_mm_dd": "12-20",
     "status": "pending",
     "note": "รอบเดือน 12"
@@ -175,7 +176,7 @@
     "id": "PAI-05",
     "owner": "PAI",
     "company": "AIA",
-    "amount": 32000.0,
+    "amount": 32000,
     "due_mm_dd": "12-21",
     "status": "pending",
     "note": "รอบเดือน 12"
@@ -184,7 +185,7 @@
     "id": "PAI-06",
     "owner": "PAI",
     "company": "ไทยประกัน",
-    "amount": 18000.0,
+    "amount": 18000,
     "due_mm_dd": "12-31",
     "status": "pending",
     "note": "รอบเดือน 12"
