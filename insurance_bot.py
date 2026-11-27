@@ -1,14 +1,22 @@
 import json
 import os
 import base64
+import time
 from datetime import datetime, timezone, timedelta, date
 import requests
+from requests.adapters import HTTPAdapter
+from urllib3.util.retry import Retry
 
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
 CHAT_ID = os.getenv("TELEGRAM_CHAT_ID")
 GH_TOKEN = os.getenv("GH_PAT")
 GH_REPO = os.getenv("GITHUB_REPOSITORY")
 DATA_FILE = "policies.json"
+
+# สร้าง Session ที่รองรับการ Retry อัตโนมัติหากการเชื่อมต่อสะดุดชั่วคราว
+session = requests.Session()
+retries = Retry(total=3, backoff_factor=1, status_forcelist=[500, 502, 503, 504])
+session.mount("https://", HTTPAdapter(max_retries=retries))
 
 BKK_TZ = timezone(timedelta(hours=7))
 now_bkk = datetime.now(BKK_TZ)
@@ -31,7 +39,6 @@ def get_nearest_due_date(mm_dd, ref_date):
             candidates.append(date(y, month, day))
         except ValueError:
             pass
-    # รองรับช่วงล่วงหน้า 7 วัน และย้อนหลังได้ถึง 65 วัน (30 วันผ่อนผัน + 30 วันเตือนซ้ำ)
     for d in sorted(candidates):
         diff = (d - ref_date).days
         if -65 <= diff <= 7:
@@ -50,9 +57,12 @@ def send_telegram_message(message, reply_markup=None):
     }
     if reply_markup:
         payload["reply_markup"] = reply_markup
-    res = requests.post(url, json=payload)
-    if res.status_code != 200:
-        print(f"ส่งข้อความไม่สำเร็จ: {res.text}")
+    try:
+        res = session.post(url, json=payload, timeout=15)
+        if res.status_code != 200:
+            print(f"ส่งข้อความไม่สำเร็จ: {res.text}")
+    except Exception as e:
+        print(f"เกิดข้อผิดพลาดในการส่งข้อความ Telegram: {e}")
 
 def process_telegram_clicks(policies):
     """เช็กว่ามีการกดปุ่ม 'จ่ายแล้ว' ใน Telegram หรือไม่ และอัปเดตสถานะ"""
@@ -60,7 +70,12 @@ def process_telegram_clicks(policies):
         return policies, False
 
     url = f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/getUpdates"
-    res = requests.get(url).json()
+    try:
+        res = session.get(url, timeout=15).json()
+    except Exception as e:
+        print(f"ดึงข้อมูล getUpdates ไม่สำเร็จ: {e}")
+        return policies, False
+
     if not res.get("ok"):
         return policies, False
 
@@ -88,10 +103,15 @@ def process_telegram_clicks(policies):
                     p["paid_date"] = today.strftime("%Y-%m-%d")
                     updated = True
 
-                    requests.post(
-                        f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/answerCallbackQuery",
-                        json={"callback_query_id": callback_id, "text": f"บันทึกจ่าย {p['id']} เรียบร้อย!"}
-                    )
+                    # พยายามตอบกลับ callback_query (หากหมดอายุแล้วให้ข้ามไปไม่ให้โปรแกรม Error)
+                    try:
+                        session.post(
+                            f"https://api.telegram.org/bot{TELEGRAM_TOKEN}/answerCallbackQuery",
+                            json={"callback_query_id": callback_id, "text": f"บันทึกจ่าย {p['id']} เรียบร้อย!"},
+                            timeout=5
+                        )
+                    except Exception:
+                        pass
 
                     confirm_msg = (
                         f"✅ <b>บันทึกการชำระเงินเรียบร้อยแล้ว!</b>\n"
@@ -105,7 +125,10 @@ def process_telegram_clicks(policies):
                     break
 
     if last_update_id > 0:
-        requests.get(url, params={"offset": last_update_id + 1})
+        try:
+            session.get(url, params={"offset": last_update_id + 1}, timeout=15)
+        except Exception as e:
+            print(f"เคลียร์ offset ไม่สำเร็จ: {e}")
 
     return policies, updated
 
@@ -121,25 +144,28 @@ def update_github_json(policies):
         "Accept": "application/vnd.github.v3+json"
     }
 
-    get_res = requests.get(api_url, headers=headers)
-    if get_res.status_code != 200:
-        print(f"ดึงข้อมูลไฟล์จาก GitHub ไม่สำเร็จ: {get_res.text}")
-        return
+    try:
+        get_res = session.get(api_url, headers=headers, timeout=15)
+        if get_res.status_code != 200:
+            print(f"ดึงข้อมูลไฟล์จาก GitHub ไม่สำเร็จ: {get_res.text}")
+            return
 
-    sha = get_res.json()["sha"]
-    new_content = json.dumps(policies, ensure_ascii=False, indent=2)
-    encoded_content = base64.b64encode(new_content.encode("utf-8")).decode("utf-8")
+        sha = get_res.json()["sha"]
+        new_content = json.dumps(policies, ensure_ascii=False, indent=2)
+        encoded_content = base64.b64encode(new_content.encode("utf-8")).decode("utf-8")
 
-    put_payload = {
-        "message": f"Update payment status via Telegram ({today.strftime('%Y-%m-%d')})",
-        "content": encoded_content,
-        "sha": sha
-    }
-    put_res = requests.put(api_url, headers=headers, json=put_payload)
-    if put_res.status_code in [200, 201]:
-        print("อัปเดตไฟล์ policies.json บน GitHub สำเร็จ")
-    else:
-        print(f"อัปเดตไฟล์ไม่สำเร็จ: {put_res.text}")
+        put_payload = {
+            "message": f"Update payment status via Telegram ({today.strftime('%Y-%m-%d')})",
+            "content": encoded_content,
+            "sha": sha
+        }
+        put_res = session.put(api_url, headers=headers, json=put_payload, timeout=15)
+        if put_res.status_code in [200, 201]:
+            print("อัปเดตไฟล์ policies.json บน GitHub สำเร็จ")
+        else:
+            print(f"อัปเดตไฟล์ไม่สำเร็จ: {put_res.text}")
+    except Exception as e:
+        print(f"เกิดข้อผิดพลาดในการอัปเดต GitHub: {e}")
 
 def run_bot():
     if not os.path.exists(DATA_FILE):
@@ -166,7 +192,7 @@ def run_bot():
             json.dump(policies, f, ensure_ascii=False, indent=2)
         update_github_json(policies)
 
-    # 3. ตรวจสอบเงื่อนไขแจ้งเตือนตามไทม์ไลน์ใหม่
+    # 3. ตรวจสอบเงื่อนไขแจ้งเตือนตามไทม์ไลน์ผ่อนผัน 30 วัน
     period_label = get_time_period(current_hour)
     is_morning = (current_hour < 11)
     is_manual_run = os.getenv("GITHUB_EVENT_NAME") == "workflow_dispatch"
@@ -174,9 +200,7 @@ def run_bot():
     alerts = []
     inline_buttons = []
 
-    # วันที่แจ้งเตือนรายสัปดาห์ (ล่วงหน้า 7 วัน, วันครบกำหนด 0, และทุกๆ 7 วันในช่วงผ่อนผัน 30 วัน)
     weekly_days = [7, 0, -7, -14, -21]
-    # 3 วันสุดท้ายของระยะเวลาผ่อนผัน 30 วัน (วันที่เลยกำหนดมาแล้ว 27, 28, 29 และครบ 30 วัน)
     grace_final_days = [-27, -28, -29, -30]
 
     for p in policies:
@@ -185,16 +209,14 @@ def run_bot():
 
         due_date = get_nearest_due_date(p["due_mm_dd"], today)
         grace_end_date = due_date + timedelta(days=30)
-        days_left = (due_date - today).days        # บวก = ก่อนครบกำหนด, ลบ = เลยวันครบกำหนด
-        grace_days_left = (grace_end_date - today).days  # วันที่เหลือของระยะเวลาผ่อนผัน 30 วัน
+        days_left = (due_date - today).days
+        grace_days_left = (grace_end_date - today).days
 
         should_notify = False
 
         if days_left in grace_final_days:
-            # 3 วันสุดท้ายของช่วงผ่อนผัน 30 วัน -> เตือนทั้ง เช้า กลางวัน เย็น
             should_notify = True
         elif days_left in weekly_days or (-60 <= days_left <= -31):
-            # ล่วงหน้า 7 วัน / วันครบกำหนด / ทุก 7 วันในช่วงผ่อนผัน / หรือเกิน 30 วันไปแล้ว -> เตือนรอบเช้า (หรือตอนกดรันทดสอบ)
             if is_morning or is_manual_run:
                 should_notify = True
 
@@ -202,7 +224,7 @@ def run_bot():
             if days_left > 0:
                 badge = f"⏳ <b>ล่วงหน้า {days_left} วันก่อนครบกำหนด</b>"
             elif days_left == 0:
-                badge = "📅 <b>ครบกำหนดชำระวันนี้! (มีระยะผ่อนผันถึง " + grace_end_date.strftime("%d/%m/%Y") + ")</b>"
+                badge = f"📅 <b>ครบกำหนดชำระวันนี้! (มีระยะผ่อนผันถึง {grace_end_date.strftime('%d/%m/%Y')})</b>"
             elif days_left in grace_final_days:
                 if grace_days_left == 0:
                     badge = "🔥 <b>วันสุดท้ายของระยะผ่อนผัน 30 วัน! (ต้องจ่ายวันนี้)</b>"
