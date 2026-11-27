@@ -31,9 +31,10 @@ def get_nearest_due_date(mm_dd, ref_date):
             candidates.append(date(y, month, day))
         except ValueError:
             pass
+    # รองรับช่วงล่วงหน้า 7 วัน และย้อนหลังได้ถึง 65 วัน (30 วันผ่อนผัน + 30 วันเตือนซ้ำ)
     for d in sorted(candidates):
         diff = (d - ref_date).days
-        if -35 <= diff <= 7:
+        if -65 <= diff <= 7:
             return d
     return min([d for d in candidates if d >= ref_date], default=candidates[-1])
 
@@ -148,14 +149,14 @@ def run_bot():
     with open(DATA_FILE, "r", encoding="utf-8") as f:
         policies = json.load(f)
 
-    # 1. ตรวจสอบการกดปุ่ม 'จ่ายแล้ว' จาก Telegram ก่อน
+    # 1. ตรวจสอบการกดปุ่ม 'จ่ายแล้ว' จาก Telegram
     policies, is_changed = process_telegram_clicks(policies)
 
-    # 2. รีเซ็ตสถานะ 'paid' กลับเป็น 'pending' อัตโนมัติเมื่อพ้นรอบปีไปแล้วเกิน 35 วัน
+    # 2. รีเซ็ตสถานะ 'paid' กลับเป็น 'pending' อัตโนมัติเมื่อพ้นรอบปีไปแล้วเกิน 65 วัน
     for p in policies:
         if p.get("status") == "paid":
             due_date = get_nearest_due_date(p["due_mm_dd"], today)
-            if (today - due_date).days > 35:
+            if (today - due_date).days > 65:
                 p["status"] = "pending"
                 p.pop("paid_date", None)
                 is_changed = True
@@ -165,7 +166,7 @@ def run_bot():
             json.dump(policies, f, ensure_ascii=False, indent=2)
         update_github_json(policies)
 
-    # 3. ตรวจสอบรายการที่ต้องแจ้งเตือน
+    # 3. ตรวจสอบเงื่อนไขแจ้งเตือนตามไทม์ไลน์ใหม่
     period_label = get_time_period(current_hour)
     is_morning = (current_hour < 11)
     is_manual_run = os.getenv("GITHUB_EVENT_NAME") == "workflow_dispatch"
@@ -173,38 +174,60 @@ def run_bot():
     alerts = []
     inline_buttons = []
 
+    # วันที่แจ้งเตือนรายสัปดาห์ (ล่วงหน้า 7 วัน, วันครบกำหนด 0, และทุกๆ 7 วันในช่วงผ่อนผัน 30 วัน)
+    weekly_days = [7, 0, -7, -14, -21]
+    # 3 วันสุดท้ายของระยะเวลาผ่อนผัน 30 วัน (วันที่เลยกำหนดมาแล้ว 27, 28, 29 และครบ 30 วัน)
+    grace_final_days = [-27, -28, -29, -30]
+
     for p in policies:
         if p.get("status") == "paid":
             continue
 
         due_date = get_nearest_due_date(p["due_mm_dd"], today)
-        days_left = (due_date - today).days
+        grace_end_date = due_date + timedelta(days=30)
+        days_left = (due_date - today).days        # บวก = ก่อนครบกำหนด, ลบ = เลยวันครบกำหนด
+        grace_days_left = (grace_end_date - today).days  # วันที่เหลือของระยะเวลาผ่อนผัน 30 วัน
 
-        if -30 <= days_left <= 7:
-            if (0 <= days_left <= 3) or is_morning or is_manual_run:
-                if days_left < 0:
-                    badge = f"🚨 <b>เลยกำหนดชำระ {abs(days_left)} วัน!</b>"
-                elif days_left == 0:
-                    badge = "🔥 <b>ครบกำหนดชำระวันนี้!</b>"
-                elif days_left <= 3:
-                    badge = f"⚠️ <b>โค้งสุดท้าย! เหลือ {days_left} วัน</b>"
+        should_notify = False
+
+        if days_left in grace_final_days:
+            # 3 วันสุดท้ายของช่วงผ่อนผัน 30 วัน -> เตือนทั้ง เช้า กลางวัน เย็น
+            should_notify = True
+        elif days_left in weekly_days or (-60 <= days_left <= -31):
+            # ล่วงหน้า 7 วัน / วันครบกำหนด / ทุก 7 วันในช่วงผ่อนผัน / หรือเกิน 30 วันไปแล้ว -> เตือนรอบเช้า (หรือตอนกดรันทดสอบ)
+            if is_morning or is_manual_run:
+                should_notify = True
+
+        if should_notify:
+            if days_left > 0:
+                badge = f"⏳ <b>ล่วงหน้า {days_left} วันก่อนครบกำหนด</b>"
+            elif days_left == 0:
+                badge = "📅 <b>ครบกำหนดชำระวันนี้! (มีระยะผ่อนผันถึง " + grace_end_date.strftime("%d/%m/%Y") + ")</b>"
+            elif days_left in grace_final_days:
+                if grace_days_left == 0:
+                    badge = "🔥 <b>วันสุดท้ายของระยะผ่อนผัน 30 วัน! (ต้องจ่ายวันนี้)</b>"
                 else:
-                    badge = f"⏳ <b>ล่วงหน้า {days_left} วัน</b>"
+                    badge = f"⚠️ <b>โค้งสุดท้ายระยะผ่อนผัน! เหลืออีก {grace_days_left} วัน</b>"
+            elif -29 <= days_left <= -1:
+                badge = f"🔔 <b>อยู่ในช่วงผ่อนผัน (เลยวันครบกำหนด {abs(days_left)} วัน / เหลือเวลาอีก {grace_days_left} วัน)</b>"
+            else:
+                badge = f"🚨 <b>เกินระยะผ่อนผัน 30 วันแล้ว! (เลยกำหนดมา {abs(days_left)} วัน)</b>"
 
-                formatted_amount = f"{p['amount']:,.2f}"
-                formatted_date = due_date.strftime("%d/%m/%Y")
+            formatted_amount = f"{p['amount']:,.2f}"
+            formatted_due = due_date.strftime("%d/%m/%Y")
+            formatted_grace = grace_end_date.strftime("%d/%m/%Y")
 
-                msg_block = (
-                    f"{badge}\n"
-                    f"👤 <b>{p['owner']}</b> | 🏢 <b>{p['company']}</b>\n"
-                    f"💰 ยอดชำระ: <b>{formatted_amount} บาท</b>\n"
-                    f"📅 ครบกำหนด: {formatted_date} ({p.get('note', '-')})"
-                )
-                alerts.append(msg_block)
+            msg_block = (
+                f"{badge}\n"
+                f"👤 <b>{p['owner']}</b> | 🏢 <b>{p['company']}</b>\n"
+                f"💰 ยอดชำระ: <b>{formatted_amount} บาท</b>\n"
+                f"📆 วันครบกำหนด: {formatted_due} (ผ่อนผันถึง {formatted_grace})\n"
+                f"📝 หมายเหตุ: {p.get('note', '-')}"
+            )
+            alerts.append(msg_block)
 
-                # สร้างปุ่มกดยืนยันการจ่ายสำหรับรายการนี้
-                btn_text = f"✅ จ่ายแล้ว: {p['owner']} - {p['company']} ({formatted_amount} บ.)"
-                inline_buttons.append([{"text": btn_text, "callback_data": f"PAY_{p['id']}"}])
+            btn_text = f"✅ จ่ายแล้ว: {p['owner']} - {p['company']} ({formatted_amount} บ.)"
+            inline_buttons.append([{"text": btn_text, "callback_data": f"PAY_{p['id']}"}])
 
     if alerts:
         header = (
