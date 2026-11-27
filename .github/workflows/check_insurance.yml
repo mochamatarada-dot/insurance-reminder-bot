@@ -1,0 +1,32 @@
+name: Insurance Payment Reminder
+
+on:
+  schedule:
+    # รอบแจ้งเตือนหลัก 3 เวลา (08:30, 12:30, 18:30 น. เวลาไทย)
+    - cron: '30 1 * * *'
+    - cron: '30 5 * * *'
+    - cron: '30 11 * * *'
+  workflow_dispatch:
+
+jobs:
+  check-and-notify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Run insurance check script
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          GH_PAT: ${{ secrets.GH_PAT }}
+          GITHUB_EVENT_NAME: ${{ github.event_name }}
+        run: python insurance_bot.py
