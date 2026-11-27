@@ -10,15 +10,15 @@
   { "id": "MIXI-09", "owner": "MIXI", "company": "MTL", "amount": 4186.00, "due_mm_dd": "11-29", "status": "pending", "note": "รอบเดือน 11" },
   { "id": "MIXI-10", "owner": "MIXI", "company": "MTL", "amount": 16308.00, "due_mm_dd": "11-29", "status": "pending", "note": "รอบเดือน 11" },
   { "id": "MIXI-11", "owner": "MIXI", "company": "MTL", "amount": 52500.00, "due_mm_dd": "12-20", "status": "pending", "note": "รอบเดือน 12" },
-  { "id": "MIXI-12", "owner": "MIXI", "company": "AIA", "amount": 34500.00, "due_mm_dd": "12-21", "status": "pending", "note": "รอบเดือน 12" },
-  { "id": "MIXI-13", "owner": "MIXI", "company": "FWD", "amount": 3625.00, "due_mm_dd": "12-23", "status": "pending", "note": "รอบเดือน 12" },
-  { "id": "MIXI-14", "owner": "MIXI", "company": "FWD", "amount": 3500.00, "due_mm_dd": "12-24", "status": "pending", "note": "รอบเดือน 12" },
-  { "id": "MIXI-15", "owner": "MIXI", "company": "FWD", "amount": 3375.00, "due_mm_dd": "12-25", "status": "pending", "note": "รอบเดือน 12" },
+  { "id": "MIXI-12", "owner": "MIXI", "company": "FWD", "amount": 3625.00, "due_mm_dd": "12-23", "status": "pending", "note": "รอบเดือน 12" },
+  { "id": "MIXI-13", "owner": "MIXI", "company": "FWD", "amount": 3500.00, "due_mm_dd": "12-24", "status": "pending", "note": "รอบเดือน 12" },
+  { "id": "MIXI-14", "owner": "MIXI", "company": "FWD", "amount": 3375.00, "due_mm_dd": "12-25", "status": "pending", "note": "รอบเดือน 12" },
 
-  { "id": "PAI-01", "owner": "PAI", "company": "FWD", "amount": 8494.00, "due_mm_dd": "07-14", "status": "pending", "note": "รอบเดือน 7" },
-  { "id": "PAI-02", "owner": "PAI", "company": "มอคค่า", "amount": 2500.00, "due_mm_dd": "11-16", "status": "pending", "note": "รอบเดือน 11" },
-  { "id": "PAI-03", "owner": "PAI", "company": "วิริยะ", "amount": 18827.99, "due_mm_dd": "11-17", "status": "pending", "note": "รอบเดือน 11" },
-  { "id": "PAI-04", "owner": "PAI", "company": "MTL", "amount": 50900.00, "due_mm_dd": "12-20", "status": "pending", "note": "รอบเดือน 12" },
-  { "id": "PAI-05", "owner": "PAI", "company": "AIA", "amount": 32000.00, "due_mm_dd": "12-21", "status": "pending", "note": "รอบเดือน 12" },
-  { "id": "PAI-06", "owner": "PAI", "company": "ไทยประกัน", "amount": 18000.00, "due_mm_dd": "12-31", "status": "pending", "note": "รอบเดือน 12" }
+  { "id": "PAI-01", "owner": "PAI", "company": "AIA", "amount": 34500.00, "due_mm_dd": "12-21", "status": "pending", "note": "รอบเดือน 12 (AIA 1)" },
+  { "id": "PAI-02", "owner": "PAI", "company": "FWD", "amount": 8494.00, "due_mm_dd": "07-14", "status": "pending", "note": "รอบเดือน 7" },
+  { "id": "PAI-03", "owner": "PAI", "company": "มอคค่า", "amount": 2500.00, "due_mm_dd": "11-16", "status": "pending", "note": "รอบเดือน 11" },
+  { "id": "PAI-04", "owner": "PAI", "company": "วิริยะ", "amount": 18827.99, "due_mm_dd": "11-17", "status": "pending", "note": "รอบเดือน 11" },
+  { "id": "PAI-05", "owner": "PAI", "company": "MTL", "amount": 50900.00, "due_mm_dd": "12-20", "status": "pending", "note": "รอบเดือน 12" },
+  { "id": "PAI-06", "owner": "PAI", "company": "AIA", "amount": 32000.00, "due_mm_dd": "12-21", "status": "pending", "note": "รอบเดือน 12 (AIA 2)" },
+  { "id": "PAI-07", "owner": "PAI", "company": "ไทยประกัน", "amount": 18000.00, "due_mm_dd": "12-31", "status": "pending", "note": "รอบเดือน 12" }
 ]
