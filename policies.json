@@ -95,8 +95,9 @@
     "company": "วิริยะ",
     "amount": 18827.99,
     "due_mm_dd": "11-17",
-    "status": "pending",
-    "note": "รอบเดือน 11"
+    "status": "paid",
+    "note": "รอบเดือน 11",
+    "paid_date": "2026-11-27"
   },
   {
     "id": "MIXI-09",
